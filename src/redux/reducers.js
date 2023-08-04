@@ -1,40 +1,23 @@
-import { combineReducers } from 'redux';
-import { setStoredContacts, storedContacts } from 'utils/localStorage';
+import { createReducer } from '@reduxjs/toolkit';
+import { storeContacts, storedContacts } from 'utils/localStorage';
+import { addContact, removeContact, setFilter } from './actions';
 
 const contactsInitialState = storedContacts('contacts', []);
 
-const contactsReducer = (state = contactsInitialState, action) => {
-  switch (action.type) {
-    case 'contacts/ADD':
-      const contacts = [...state, action.payload];
-      setStoredContacts('contacts', contacts);
-      return contacts;
-
-    case 'contacts/REMOVE':
-      const newContacts = state.filter(
-        contact => contact.id !== action.payload
-      );
-      setStoredContacts('contacts', newContacts);
-      return newContacts;
-
-    default:
-      return state;
-  }
-};
+export const contactsReducer = createReducer(contactsInitialState, {
+  [addContact]: (state, action) => {
+    storeContacts([...state, action.payload]);
+    return [...state, action.payload];
+  },
+  [removeContact]: (state, action) => {
+    const newContacts = state.filter(contact => contact.id !== action.payload);
+    storeContacts(newContacts);
+    return newContacts;
+  },
+});
 
 const filterInitialState = '';
 
-const filterReducer = (state = filterInitialState, action) => {
-  switch (action.type) {
-    case 'filter/SET':
-      return action.payload;
-
-    default:
-      return state;
-  }
-};
-
-export const rootReducer = combineReducers({
-  contacts: contactsReducer,
-  filter: filterReducer,
+export const filterReducer = createReducer(filterInitialState, {
+  [setFilter]: (state, action) => action.payload,
 });
