@@ -1,11 +1,11 @@
-import PropTypes from 'prop-types';
 import styles from './Filter.module.css';
+import { useDispatch } from 'react-redux';
+import { setFilter } from 'redux/actions';
 
-const Filter = ({ onFilterChange }) => {
-  const handleChange = e => {
-    const filterValue = e.target.value;
-    onFilterChange(filterValue);
-  };
+const Filter = () => {
+  const dispatch = useDispatch();
+
+  const handleChange = e => dispatch(setFilter(e.target.value));
 
   return (
     <div>
@@ -20,10 +20,6 @@ const Filter = ({ onFilterChange }) => {
       </label>
     </div>
   );
-};
-
-Filter.propTypes = {
-  onFilterChange: PropTypes.func,
 };
 
 export default Filter;

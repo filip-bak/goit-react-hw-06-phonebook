@@ -1,42 +1,39 @@
-import PropTypes from 'prop-types';
 import styles from './ContactList.module.css';
 
-const ContactList = ({ contacts, filterQuery, onRemoveContact }) => {
-  const handleRemoveContact = e => {
-    const { id } = e.currentTarget.dataset;
+import { getContacts } from 'redux/selectors';
+import { useDispatch, useSelector } from 'react-redux';
+import { removeContact } from 'redux/actions';
 
-    onRemoveContact(id);
+const ContactList = () => {
+  const contacts = useSelector(getContacts);
+  const filter = useSelector(state => state.filter);
+
+  const dispatch = useDispatch();
+
+  const handleRemoveContact = id => dispatch(removeContact(id));
+
+  const filteredContacts = () => {
+    return contacts.filter(contact =>
+      contact.name.toLowerCase().includes(filter)
+    );
   };
 
   return (
     <ul className={styles.list}>
-      {contacts
-        .filter(contact => {
-          return filterQuery === ''
-            ? contact
-            : contact.name.toLowerCase().includes(filterQuery);
-        })
-        .map(({ id, name, number }) => {
-          return (
-            <li className={styles.item} key={id}>
-              <span className={styles.name}>{name}:</span>&nbsp;
-              <span className={styles['phone-number']}>{number}</span>
-              <button
-                className={styles.btn}
-                data-id={id}
-                onClick={handleRemoveContact}
-              ></button>
-            </li>
-          );
-        })}
+      {filteredContacts().map(({ id, name, number }) => {
+        return (
+          <li className={styles.item} key={id}>
+            <span className={styles.name}>{name}:</span>&nbsp;
+            <span className={styles['phone-number']}>{number}</span>
+            <button
+              className={styles.btn}
+              onClick={() => handleRemoveContact(id)}
+            ></button>
+          </li>
+        );
+      })}
     </ul>
   );
-};
-
-ContactList.propTypes = {
-  contacts: PropTypes.arrayOf(PropTypes.object),
-  filterQuery: PropTypes.string,
-  onRemoveContact: PropTypes.func,
 };
 
 export default ContactList;
